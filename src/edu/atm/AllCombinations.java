@@ -31,21 +31,12 @@ class AllCombinations {
                     for (int j = 0; j < numberOfBanknotes; j++) {
                         Integer currentBank = banknotes[j];
                         if ((i + currentBank <= sum - banknotes[0] + 1) || (i + currentBank == sum)) {
-                            ExchangeOptions currentSum;
-                            if (allSum.containsKey(i + currentBank)) {
-                                currentSum = allSum.get(i + currentBank);
-                            } else {
-                                currentSum = new ExchangeOptions();
-                                allSum.put(i + currentBank, currentSum);
-                            }
-                            allSum.get(i).getOptions().forEach(oldCombination -> {
-                                Combination currentCombination = oldCombination.copy();
-                                currentCombination.put(currentBank);
-                                currentSum.add(currentCombination);
-                            });
+                            ExchangeOptions currentSum = addNewSum(allSum, i + currentBank);
+                            allSum.get(i).addOldCombinations(currentBank, currentSum);
                         }
                     }
                 }
+                allSum.remove(i);
             }
             if (allSum.get(sum) == null) {
                 return new ExchangeOptions();
@@ -54,5 +45,16 @@ class AllCombinations {
         } catch (Exception e) {
             return new ExchangeOptions();
         }
+    }
+
+    private static ExchangeOptions addNewSum(HashMap<Integer, ExchangeOptions> allSum, Integer index){
+        ExchangeOptions result;
+        if (allSum.containsKey(index)) {
+            result = allSum.get(index);
+        } else {
+            result = new ExchangeOptions();
+            allSum.put(index, result);
+        }
+        return result;
     }
 }

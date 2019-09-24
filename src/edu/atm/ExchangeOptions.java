@@ -49,6 +49,14 @@ public class ExchangeOptions {
         }
     }
 
+    public void addOldCombinations(Integer currentBank, ExchangeOptions currentSum){
+        this.getOptions().forEach(oldCombination -> {
+            Combination currentCombination = oldCombination.copy();
+            currentCombination.put(currentBank);
+            currentSum.add(currentCombination);
+        });
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ExchangeOptions)) {
@@ -86,87 +94,5 @@ public class ExchangeOptions {
             res.append("\n");
         });
         return (res.toString());
-    }
-}
-
-class Combination {
-    TreeMap<Integer, Integer> combination;
-
-    Combination(TreeMap<Integer, Integer> combination) {
-        this.combination = (TreeMap<Integer, Integer>) combination.clone();
-    }
-
-    Combination(Integer nominal, Integer number) {
-        combination = new TreeMap<>(Comparator.reverseOrder());
-        combination.put(nominal, number);
-    }
-
-    Combination(Integer[] nominal) {
-        combination = new TreeMap<>(Comparator.reverseOrder());
-        Set<Integer> set = new HashSet<>(Arrays.asList(nominal));
-        for (Integer banknotes : set) {
-            combination.put(banknotes, 1);
-        }
-    }
-
-    Combination(Integer[] nominal, Integer value) {
-        combination = new TreeMap<>(Comparator.reverseOrder());
-        Set<Integer> set = new HashSet<>(Arrays.asList(nominal));
-        for (Integer banknotes : set) {
-            combination.put(banknotes, value);
-        }
-    }
-
-    void put(Integer banknote) {
-        if (combination.containsKey(banknote)) {
-            combination.replace(banknote, combination.get(banknote) + 1);
-        } else {
-            combination.put(banknote, 1);
-        }
-    }
-
-    Combination cleanUp() {
-        Combination result = this.copy();
-        combination.forEach((Integer nominal, Integer value) -> {
-            if (value < 1) {
-                result.combination.remove(nominal);
-            }
-        });
-        return result;
-    }
-
-    void take(Integer banknote) {
-        if (combination.containsKey(banknote)) {
-            if (combination.get(banknote) >= 1) {
-                combination.replace(banknote, combination.get(banknote) - 1);
-            }
-        }
-    }
-
-    Integer get(Integer banknote) {
-        return combination.getOrDefault(banknote, 0);
-    }
-
-    Combination copy() {
-        return new Combination((TreeMap<Integer, Integer>) combination.clone());
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder res = new StringBuilder();
-        for (Integer t : combination.keySet()) {
-            for (int i = 0; i < combination.get(t); i++) {
-                res.append(t).append(" ");
-            }
-        }
-        return (res.toString());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Combination)) {
-            return (false);
-        }
-        return (this.combination.equals(((Combination) o).combination));
     }
 }
